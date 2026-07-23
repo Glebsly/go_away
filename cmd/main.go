@@ -58,9 +58,12 @@ func doAction(action string) {
 		if game.currentPlace == "комната" {
 			take(action)
 		} else {
-			fmt.Print("нет такого")
+			fmt.Println("нет такого")
 		}
-
+	case strings.HasPrefix(action, "применить"):
+		use(action)
+	default:
+		fmt.Println("неизвестная команда")
 	}
 
 }
@@ -136,5 +139,22 @@ func take(action string) {
 		fmt.Println("предмет добавлен в инвентарь: ", item)
 	} else {
 		fmt.Println("нет такого")
+	}
+}
+
+func use(action string) {
+	words := strings.Fields(action)
+
+	if len(words) < 3 {
+		fmt.Println("что-то не так")
+		return
+	}
+
+	if words[1] == "ключ" && game.items[words[1]] == false {
+		fmt.Println("нет предмета в инвентаре - ", words[1])
+	} else if words[2] == "дверь" {
+		fmt.Println("дверь открыта")
+	} else {
+		fmt.Println("не к чему применить")
 	}
 }
