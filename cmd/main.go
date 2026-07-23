@@ -8,7 +8,7 @@ import (
 )
 
 type gameState struct {
-	doorClosed   bool
+	doorOpened   bool
 	backpackOn   bool
 	items        map[string]bool
 	currentPlace string
@@ -69,7 +69,7 @@ func doAction(action string) {
 }
 
 func initGame() {
-	game.doorClosed = true
+	game.doorOpened = false
 	game.backpackOn = false
 	game.items = map[string]bool{"ключи": false, "конспекты": false}
 
@@ -116,6 +116,12 @@ func move(action string) {
 		case "комната":
 			fmt.Println("ты зашел ", destination)
 			game.currentPlace = "комната"
+		case "улица":
+			if game.doorOpened == true {
+				fmt.Println("на улице весна. можно пройти - домой")
+			} else {
+				fmt.Println("дверь закрыта")
+			}
 		default:
 			fmt.Println("нет пути в", destination)
 		}
@@ -128,6 +134,16 @@ func move(action string) {
 		default:
 			fmt.Println("нет пути в", destination)
 		}
+
+	case "улица":
+		switch destination {
+		case "домой":
+			fmt.Println("ты зашел ", destination)
+			game.currentPlace = "коридор"
+		default:
+			fmt.Println("нет пути в", destination)
+		}
+
 	}
 }
 
@@ -137,6 +153,7 @@ func take(action string) {
 	if game.items[item] == false {
 		game.items[item] = true
 		fmt.Println("предмет добавлен в инвентарь: ", item)
+		fmt.Println(game.items[item])
 	} else {
 		fmt.Println("нет такого")
 	}
@@ -152,7 +169,8 @@ func use(action string) {
 
 	if words[1] == "ключ" && game.items[words[1]] == false {
 		fmt.Println("нет предмета в инвентаре - ", words[1])
-	} else if words[2] == "дверь" {
+	} else if words[2] == "дверь" && game.currentPlace == "коридор" {
+		game.doorOpened = true
 		fmt.Println("дверь открыта")
 	} else {
 		fmt.Println("не к чему применить")
