@@ -149,11 +149,13 @@ func move(action string) {
 
 func take(action string) {
 	item, _ := strings.CutPrefix(action, "взять ")
-
+	if game.backpackOn == false {
+		fmt.Println("некуда класть")
+		return
+	}
 	if game.items[item] == false {
 		game.items[item] = true
 		fmt.Println("предмет добавлен в инвентарь: ", item)
-		fmt.Println(game.items[item])
 	} else {
 		fmt.Println("нет такого")
 	}
