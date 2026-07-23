@@ -36,34 +36,34 @@ func main() {
 			initGame()
 			continue
 		}
-		doAction(command)
+		fmt.Println(handleCommand(command))
 	}
 }
 
-func doAction(action string) {
+func handleCommand(action string) string {
 
 	switch {
 	case strings.EqualFold(action, "осмотреться"):
-		lookAround()
+		return lookAround()
 	case strings.EqualFold(action, "надеть рюкзак"):
 		if game.currentPlace == "комната" {
 			game.backpackOn = true
-			fmt.Print("вы надели: рюкзак")
+			return "вы надели: рюкзак"
 		} else {
-			fmt.Print("рюкзак лежит в комнате")
+			return "рюкзак лежит в комнате"
 		}
 	case strings.HasPrefix(action, "идти"):
-		move(action)
+		return move(action)
 	case strings.HasPrefix(action, "взять"):
 		if game.currentPlace == "комната" {
-			take(action)
+			return take(action)
 		} else {
-			fmt.Println("нет такого")
+			return "нет такого"
 		}
 	case strings.HasPrefix(action, "применить"):
-		use(action)
+		return use(action)
 	default:
-		fmt.Println("неизвестная команда")
+		return "неизвестная команда"
 	}
 
 }
@@ -80,108 +80,112 @@ func initGame() {
 		"чтобы узнать команды введите Справка\n")
 }
 
-func lookAround() {
+func lookAround() string {
 	switch game.currentPlace {
 	case "кухня":
-		fmt.Println("ты находишься на кухне, на столе: чай, надо собрать рюкзак и идти в универ. можно пройти - коридор")
+		return "ты находишься на кухне, на столе: чай, надо собрать рюкзак и идти в универ. можно пройти - коридор"
 	case "коридор":
-		fmt.Println("ты в коридоре. можно пройти - комната, кухня")
+		return "ты в коридоре. можно пройти - комната, кухня"
 	case "комната":
 		// 	TODO упростить
 		switch {
 		case game.items["ключ"] == false && game.items["конспекты"] == false:
-			fmt.Println("на столе: ключи, конспекты. можно пройти - коридор")
+			return "на столе: ключи, конспекты. можно пройти - коридор"
 		case game.items["ключ"] == true && game.items["конспекты"] == false:
-			fmt.Println("на столе: конспекты. можно пройти - коридор")
+			return "на столе: конспекты. можно пройти - коридор"
 		case game.items["ключ"] == false && game.items["конспекты"] == true:
-			fmt.Println("на столе: конспекты. можно пройти - коридор")
+			return "на столе: конспекты. можно пройти - коридор"
 		case game.items["ключ"] == true && game.items["конспекты"] == true:
-			fmt.Println("пустая комната. можно пройти - коридор")
+			return "пустая комната. можно пройти - коридор"
+		default:
+			return fmt.Sprint("что-то не так")
 		}
+	default:
+		return fmt.Sprint("что-то не так")
 	}
 }
 
-func move(action string) {
+func move(action string) string {
 	destination, _ := strings.CutPrefix(action, "идти ")
 	if strings.EqualFold(destination, game.currentPlace) {
-		fmt.Println("ты уже здесь")
+		return fmt.Sprintf("ты уже здесь")
 	}
 
 	switch game.currentPlace {
 	case "кухня":
 		switch destination {
 		case "коридор":
-			fmt.Println("ты зашел ", destination)
 			game.currentPlace = "коридор"
+			return "ничего интересного. можно пройти - кухня, комната, улица"
 		default:
-			fmt.Println("нет пути в", destination)
+			return fmt.Sprintf("нет пути в %s", destination)
 		}
 
 	case "коридор":
 		switch destination {
 		case "кухня":
-			fmt.Println("ты зашел ", destination)
 			game.currentPlace = "кухня"
+			return fmt.Sprintf("ты зашел %s", destination)
 		case "комната":
-			fmt.Println("ты зашел ", destination)
 			game.currentPlace = "комната"
+			return "ты в своей комнате. можно пройти - коридор"
 		case "улица":
 			if game.doorOpened == true {
-				fmt.Println("на улице весна. можно пройти - домой")
+				return "на улице весна. можно пройти - домой"
 			} else {
-				fmt.Println("дверь закрыта")
+				return "дверь закрыта"
 			}
 		default:
-			fmt.Println("нет пути в", destination)
+			return fmt.Sprintf("нет пути в %s", destination)
 		}
 
 	case "комната":
 		switch destination {
 		case "коридор":
-			fmt.Println("ты зашел ", destination)
 			game.currentPlace = "коридор"
+			return fmt.Sprintf("ты зашел %s", destination)
 		default:
-			fmt.Println("нет пути в", destination)
+			return fmt.Sprintf("нет пути в %s", destination)
 		}
 
 	case "улица":
 		switch destination {
 		case "домой":
-			fmt.Println("ты зашел ", destination)
 			game.currentPlace = "коридор"
+			return fmt.Sprintf("ты зашел %s", destination)
 		default:
-			fmt.Println("нет пути в", destination)
+			return fmt.Sprintf("нет пути в %s", destination)
 		}
-
+	default:
+		return fmt.Sprintf("что-то не так")
 	}
+
 }
 
-func take(action string) {
+func take(action string) string {
 	item, _ := strings.CutPrefix(action, "взять ")
 
 	if game.items[item] == false {
 		game.items[item] = true
-		fmt.Println("предмет добавлен в инвентарь: ", item)
-		fmt.Println(game.items[item])
+		return fmt.Sprintf("предмет добавлен в инвентарь: %s", item)
 	} else {
-		fmt.Println("нет такого")
+		return fmt.Sprintf("нет такого")
 	}
 }
 
-func use(action string) {
+func use(action string) string {
 	words := strings.Fields(action)
 
 	if len(words) < 3 {
-		fmt.Println("что-то не так")
-		return
+		return fmt.Sprintf("что-то не так")
 	}
 
 	if words[1] == "ключ" && game.items[words[1]] == false {
-		fmt.Println("нет предмета в инвентаре - ", words[1])
+		return fmt.Sprintf("нет предмета в инвентаре - %s", words[1])
 	} else if words[2] == "дверь" && game.currentPlace == "коридор" {
 		game.doorOpened = true
-		fmt.Println("дверь открыта")
+		return fmt.Sprintf("дверь открыта")
 	} else {
-		fmt.Println("не к чему применить")
+		return fmt.Sprintf("не к чему применить")
 	}
 }
