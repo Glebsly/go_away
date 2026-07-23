@@ -87,8 +87,17 @@ func lookAround() {
 	case "коридор":
 		fmt.Println("ты в коридоре. можно пройти - комната, кухня")
 	case "комната":
-		// 	checkRoomItems() доработать проверку объектов в комнате
-		fmt.Println("на столе: ключи, конспекты. можно пройти - коридор")
+		// 	TODO упростить
+		switch {
+		case game.items["ключ"] == false && game.items["конспекты"] == false:
+			fmt.Println("на столе: ключи, конспекты. можно пройти - коридор")
+		case game.items["ключ"] == true && game.items["конспекты"] == false:
+			fmt.Println("на столе: конспекты. можно пройти - коридор")
+		case game.items["ключ"] == false && game.items["конспекты"] == true:
+			fmt.Println("на столе: конспекты. можно пройти - коридор")
+		case game.items["ключ"] == true && game.items["конспекты"] == true:
+			fmt.Println("пустая комната. можно пройти - коридор")
+		}
 	}
 }
 
